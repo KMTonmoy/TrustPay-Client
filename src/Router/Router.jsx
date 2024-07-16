@@ -6,6 +6,7 @@ import Registration from "../Pages/Register/Resgister";
 import PrivateRoute from "./PrivateRoute";
 import BalanceInquiry from "../Components/BalenceInquery/BalenceInquery";
 import TransactionList from "../Components/Trangection/Trangection";
+import Sendmoney from "../Pages/Sendmoney/Sendmoney";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -29,6 +30,18 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/transactions",
+                element: <TransactionList />,
+            },
+            {
+                path: "/sendmoney",
+                element: <Sendmoney />,
+            },
+            {
+                path: "/cashout",
+                element: <TransactionList />,
+            },
+            {
+                path: "/cashin",
                 element: <TransactionList />,
             },
         ]

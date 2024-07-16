@@ -15,7 +15,8 @@ const TransactionList = () => {
                     throw new Error('Failed to fetch transactions');
                 }
                 const data = await response.json();
-                const reversedTransactions = data.transactions.reverse();
+                // Check if data.transactions exists before reversing
+                const reversedTransactions = data.transactions ? data.transactions.reverse() : [];
                 setTransactions(reversedTransactions);
             } catch (error) {
                 console.error('Error fetching transactions:', error);
