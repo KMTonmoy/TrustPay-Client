@@ -41,9 +41,10 @@ const Registration = () => {
 
             const userData = {
                 name: formData.name,
-                pin: pinMain,
+                pin: formData.pin,
                 mobileNumber: formData.mobileNumber,
-                email: formData.email
+                email: formData.email,
+                role: "user",
             };
 
 
