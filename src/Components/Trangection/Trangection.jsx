@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { AuthContext } from '../../providers/AuthProvider';
 
 const TransactionList = () => {
@@ -31,15 +32,22 @@ const TransactionList = () => {
                 <p className="text-center">No transactions found.</p>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {transactions.map(transaction => (
-                        <div key={transaction.id} className="bg-white p-4 shadow-md rounded-lg">
+                    {transactions.slice(0, 10).map(transaction => (
+                        <motion.div
+                            key={transaction.id}
+                            className="bg-white p-4 shadow-md rounded-lg"
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            whileHover={{ scale: 1.05 }}
+                        >
                             <p className="text-gray-800"><strong>Transaction ID:</strong> {transaction.id}</p>
                             <p className="text-gray-800"><strong>Type:</strong> {transaction.transactionType}</p>
                             <p className="text-gray-800"><strong>Amount:</strong> {transaction.amount} Taka</p>
                             <p className="text-gray-800"><strong>Recipient Mobile:</strong> {transaction.recipientMobileNumber}</p>
                             <p className="text-gray-800"><strong>Sender Mobile:</strong> {transaction.senderMobileNumber}</p>
                             <p className="text-gray-800"><strong>Date:</strong> {transaction.date}</p>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             )}

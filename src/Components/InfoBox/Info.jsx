@@ -11,7 +11,7 @@ const Info = () => {
                     throw new Error('Failed to fetch users');
                 }
                 const data = await response.json();
-                setUsers(data);  // Directly using the fetched array
+                setUsers(data);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }

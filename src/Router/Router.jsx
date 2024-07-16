@@ -4,6 +4,8 @@ import Home from "../Pages/Home/Home";
 import Login from "../Pages/Login/Login";
 import Registration from "../Pages/Register/Resgister";
 import PrivateRoute from "./PrivateRoute";
+import BalanceInquiry from "../Components/BalenceInquery/BalenceInquery";
+import TransactionList from "../Components/Trangection/Trangection";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -20,6 +22,14 @@ export const router = createBrowserRouter([
             {
                 path: "/login",
                 element: <Login />,
+            },
+            {
+                path: "/balance",
+                element: <BalanceInquiry />,
+            },
+            {
+                path: "/transactions",
+                element: <TransactionList />,
             },
         ]
     },
