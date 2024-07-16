@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 import { AuthContext } from '../../providers/AuthProvider';
-
+import { Link } from 'react-router-dom';
 
 const Registration = () => {
     const { createUser, user, updateUserProfile } = useContext(AuthContext);
@@ -13,9 +14,7 @@ const Registration = () => {
         email: ''
     });
 
-
-
-    console.log(user)
+    console.log(user);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,15 +27,28 @@ const Registration = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (formData.pin.length < 5) {
+        if (formData.pin.length !== 5) {
             toast.error('PIN must be a 5-digit number.');
             return;
         }
 
+        const pinMain = formData.pin + 1;
+
         try {
-            await createUser(formData.email, formData.pin);
+            await createUser(formData.email, pinMain, formData.mobileNumber);
             toast.success('Registration successful!');
-            await updateUserProfile(formData.name, formData.pin);
+            await updateUserProfile(formData.name, pinMain);
+
+            const userData = {
+                name: formData.name,
+                pin: pinMain,
+                mobileNumber: formData.mobileNumber,
+                email: formData.email
+            };
+
+
+            await axios.post('http://localhost:8000/user', userData);
+
             console.log('User registered successfully:', formData.email);
             setFormData({
                 name: '',
@@ -132,6 +144,9 @@ const Registration = () => {
                             >
                                 Register
                             </button>
+                            <p className="mt-4 text-center text-sm text-gray-600">
+                                Already Have An Account!! <Link to={'/login'} className="font-medium text-primary">Please Login</Link>
+                            </p>
                         </div>
                     </form>
                 </div>
