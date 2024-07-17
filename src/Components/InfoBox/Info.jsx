@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CountUp from 'react-countup'; // Import react-countup
 
 const Info = () => {
     const [users, setUsers] = useState([]);
@@ -26,15 +27,21 @@ const Info = () => {
         <div className='flex justify-center flex-col gap-5 md:flex-row md:justify-evenly p-10'>
             <div className="bg-gradient-to-r from-purple-400 to-blue-500 p-10 rounded-2xl w-full md:w-[450px] h-[150px]">
                 <span role="img" aria-label="total users" className="text-3xl text-white mr-4">👥</span>
-                <p className="text-xl font-semibold text-white capitalize">Total Users: {users.length}</p>
+                <p className="text-xl font-semibold text-white capitalize">
+                    Total Users: <CountUp end={users.length} duration={2} separator="," />
+                </p>
             </div>
             <div className="bg-gradient-to-r from-yellow-400 to-pink-500 p-10 rounded-2xl w-full md:w-[450px] h-[150px]">
                 <span role="img" aria-label="total agents" className="text-3xl text-white mr-4">🕴️</span>
-                <p className="text-xl font-semibold text-white capitalize">Total Agents: {agentCount}</p>
+                <p className="text-xl font-semibold text-white capitalize">
+                    Total Agents: <CountUp end={agentCount} duration={2} separator="," />
+                </p>
             </div>
             <div className="bg-gradient-to-r from-green-400 to-blue-500 p-10 rounded-2xl w-full md:w-[450px] h-[150px]">
                 <span role="img" aria-label="total members" className="text-3xl text-white mr-4">🧑‍🤝‍🧑</span>
-                <p className="text-xl font-semibold text-white capitalize">Total Members: {users.length}</p>
+                <p className="text-xl font-semibold text-white capitalize">
+                    Total Members: <CountUp end={users.length} duration={2} separator="," />
+                </p>
             </div>
         </div>
     );

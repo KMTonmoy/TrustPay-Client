@@ -7,6 +7,8 @@ import PrivateRoute from "./PrivateRoute";
 import BalanceInquiry from "../Components/BalenceInquery/BalenceInquery";
 import TransactionList from "../Components/Trangection/Trangection";
 import Sendmoney from "../Pages/Sendmoney/Sendmoney";
+import Cashout from "../Pages/Cashout/Cashout";
+import Cashin from "../Pages/Cashin/Cashin";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -38,11 +40,11 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/cashout",
-                element: <TransactionList />,
+                element: <Cashout />,
             },
             {
                 path: "/cashin",
-                element: <TransactionList />,
+                element: <Cashin />,
             },
         ]
     },

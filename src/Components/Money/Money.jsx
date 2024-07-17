@@ -5,19 +5,37 @@ import { motion } from 'framer-motion';
 import { BsCashCoin } from "react-icons/bs";
 import { AuthContext } from '../../providers/AuthProvider';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import CountUp from 'react-countup'; // Import react-countup
 
 const Money = () => {
+    const [myMoney, setMyBalance] = useState(0);
+    const { user } = useContext(AuthContext);
+    const mobile = user?.photoURL;
 
-    const [amount, setAmount] = useState('');
+    useEffect(() => {
+        if (mobile) {
+            fetchUserBalance(mobile);
+        }
+    }, [mobile]);
 
- 
-
+    const fetchUserBalance = (mobileNumber) => {
+        axios.get(`http://localhost:8000/users/mobile/${mobileNumber}`)
+            .then(response => {
+                setMyBalance(response.data.money);
+            })
+            .catch(error => {
+                console.error('Error fetching user balance:', error);
+            });
+    };
 
     return (
         <div className="bg-gray-100 flex items-center justify-center">
             <div className="w-full h-[500px] py-20 mx-auto bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="px-4 py-8 sm:px-10">
-                    <h1 className="text-4xl font-bold text-center text-primary mb-4">$ 5730</h1>
+                    <h1 className="text-4xl font-bold text-center text-primary mb-4">
+                        <CountUp end={myMoney} duration={2} separator="," /> Taka
+                    </h1>
                     <h2 className="text-xl font-semibold text-center text-gray-700 mb-6">My Balance</h2>
                     <div className="flex justify-center space-x-6">
                         <Link to={'/sendmoney'}>
@@ -44,7 +62,6 @@ const Money = () => {
                         </Link>
 
                         <Link to={'/cashin'}>
-
                             <motion.button
                                 onClick={() => openModal('cashIn')}
                                 whileHover={{ scale: 1.05 }}
@@ -54,13 +71,10 @@ const Money = () => {
                                 <BsCashCoin className="text-4xl mb-2 text-primary" />
                                 <p className="text-lg font-semibold">Cash In</p>
                             </motion.button>
-
                         </Link>
-
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };
