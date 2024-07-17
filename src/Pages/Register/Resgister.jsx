@@ -6,15 +6,13 @@ import { AuthContext } from '../../providers/AuthProvider';
 import { Link } from 'react-router-dom';
 
 const Registration = () => {
-    const { createUser, user, updateUserProfile } = useContext(AuthContext);
+    const { createUser, updateUserProfile } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         name: '',
         pin: '',
         mobileNumber: '',
         email: ''
     });
-
-    console.log(user);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -32,7 +30,7 @@ const Registration = () => {
             return;
         }
 
-        const pinMain = formData.pin + 1;
+        const pinMain = formData.pin + '1';
 
         try {
             await createUser(formData.email, pinMain, formData.mobileNumber);
@@ -41,22 +39,29 @@ const Registration = () => {
 
             const userData = {
                 name: formData.name,
-                pin: formData.pin,
+                pin: pinMain,
                 mobileNumber: formData.mobileNumber,
                 email: formData.email,
+                money: 0,
                 role: "user",
             };
 
+            setTimeout(async () => {
+                try {
+                    await axios.post('http://localhost:8000/user', userData);
+                    console.log('User registered successfully:', formData.email);
+                    setFormData({
+                        name: '',
+                        pin: '',
+                        mobileNumber: '',
+                        email: ''
+                    });
+                } catch (error) {
+                    console.error('Error saving user to database:', error.message);
+                    toast.error('Failed to register user. Please try again.');
+                }
+            }, 5000); // 5 seconds delay
 
-            await axios.post('http://localhost:8000/user', userData);
-
-            console.log('User registered successfully:', formData.email);
-            setFormData({
-                name: '',
-                pin: '',
-                mobileNumber: '',
-                email: ''
-            });
         } catch (error) {
             console.error('Error registering user:', error.message);
             toast.error('Failed to register user. Please try again.');

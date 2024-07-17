@@ -12,10 +12,9 @@ const Sendmoney = () => {
     const [totalAmount, setTotalAmount] = useState(0);
     const [showError, setShowError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showPinError, setShowPinError] = useState(false);
     const { user } = useContext(AuthContext);
     const userEmail = user?.email;
-
-
 
     const handleSendMoney = async (e) => {
         e.preventDefault();
@@ -34,18 +33,17 @@ const Sendmoney = () => {
 
         setShowError(false);
 
-        try {
-            const response = await axios.get(`http://localhost:8000/users/${userEmail}`);
-            const userData = response.data;
+        const response = await axios.get(`http://localhost:8000/users/${userEmail}`);
+        const userData = response.data;
 
-            if (userData.pin === pin.value) {
-                setIsModalOpen(true);
-            } else {
-                toast.error('Incorrect PIN. Please try again.');
-            }
-        } catch (error) {
-            toast.error('Failed to fetch user data. Please try again later.');
+        if (userData.pin === pin) {
+            setIsModalOpen(true);
+            setShowPinError(false);
+        } else {
+            setShowPinError(true);
+            toast.error('Incorrect PIN. Please try again.');
         }
+
     };
 
     const confirmSendMoney = () => {
@@ -92,12 +90,13 @@ const Sendmoney = () => {
                         </label>
                         <input
                             id="pin"
-                            type="number"
+                            type="text"
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             value={pin}
                             onChange={(e) => setPin(e.target.value)}
                             required
                         />
+                        {showPinError && <p className="text-red-500 text-sm mt-2">Incorrect PIN. Please try again.</p>}
                     </div>
                     <div className="mb-6 text-center">
                         <motion.button

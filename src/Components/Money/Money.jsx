@@ -7,42 +7,11 @@ import { AuthContext } from '../../providers/AuthProvider';
 import { Link } from 'react-router-dom';
 
 const Money = () => {
-    const { user } = useContext(AuthContext);
-    const [currentModal, setCurrentModal] = useState(null);
-    const [recipientNumber, setRecipientNumber] = useState('');
+
     const [amount, setAmount] = useState('');
-    const [pin, setPin] = useState('');
-    const [showError, setShowError] = useState(false);
-    const [totalAmount, setTotalAmount] = useState(0);
 
+ 
 
-
-
-
-
-
-    const handleSendMoney = () => {
-
-        let totalWithFee = parseFloat(amount);
-        if (totalWithFee > 100) {
-            totalWithFee += 5;
-        }
-
-        setTotalAmount(totalWithFee);
-
-        openModal('sendMoney');
-    };
-
-    const handleAmountChange = (e) => {
-        const value = e.target.value;
-        setAmount(value);
-        setShowError(value < 50);
-    };
-    const handelChangePIN = (e) => {
-        const value = e.target.value;
-        setPin(value);
-
-    };
 
     return (
         <div className="bg-gray-100 flex items-center justify-center">
@@ -53,7 +22,6 @@ const Money = () => {
                     <div className="flex justify-center space-x-6">
                         <Link to={'/sendmoney'}>
                             <motion.button
-                                onClick={() => handleSendMoney()}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="flex flex-col items-center p-4 rounded-2xl w-[150px] bg-primary text-white hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
