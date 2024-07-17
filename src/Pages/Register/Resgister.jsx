@@ -60,7 +60,7 @@ const Registration = () => {
                     console.error('Error saving user to database:', error.message);
                     toast.error('Failed to register user. Please try again.');
                 }
-            }, 5000); // 5 seconds delay
+            }, 5000); 
 
         } catch (error) {
             console.error('Error registering user:', error.message);
