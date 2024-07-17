@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthContext } from '../../providers/AuthProvider';
 
 const Sendmoney = () => {
     const [recipientNumber, setRecipientNumber] = useState('');
@@ -11,9 +12,19 @@ const Sendmoney = () => {
     const [showError, setShowError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showPinError, setShowPinError] = useState(false);
+    const [myBalance, setMyBalance] = useState(0);
     const [showRecipientError, setShowRecipientError] = useState(false);
     const [recipientData, setRecipientData] = useState(null);
-    const [extraCharge, setExtraCharge] = useState(0); // State for extra charge
+    const [extraCharge, setExtraCharge] = useState(0);
+    const { user } = useContext(AuthContext);
+    const mobile = user?.photoURL;
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/users/mobile/${mobile}`)
+            .then(response => response.json())
+            .then(json => setMyBalance(json.money))
+            .catch(error => console.error('Error fetching user balance:', error));
+    }, [mobile]);
 
     const handleSendMoney = async (e) => {
         e.preventDefault();
@@ -37,22 +48,20 @@ const Sendmoney = () => {
                 return;
             }
 
-            // Check if PIN matches
+            const mainPin = Math.floor(pin) + 1;
 
-            const mainPin = pin + 1
-
-
-            if (data.pin !== mainPin) {
+            if (Math.floor(data.pin) !== mainPin) {
                 setShowPinError(true);
                 toast.error('Incorrect PIN. Please try again.');
                 return;
             }
 
+
             setShowRecipientError(false);
             setShowPinError(false);
             setRecipientData(data);
 
-            // Calculate extra charge
+
             if (amountFloat >= 100) {
                 setExtraCharge(5);
             } else {
@@ -61,36 +70,41 @@ const Sendmoney = () => {
 
             setIsModalOpen(true);
         } catch (error) {
-            console.error('Error sending money:', error.message);
-            toast.error('Failed to send money. Please try again.');
+            console.error('Error fetching recipient data:', error);
+            toast.error('Failed to fetch recipient data. Please try again.');
         }
     };
 
     const confirmSendMoney = async () => {
         try {
             const amountFloat = parseFloat(amount);
+            const totalDeduction = amountFloat + extraCharge;
 
-            const newmoney = parseFloat(recipientData.money) + amountFloat + extraCharge;
-            await axios.patch(`http://localhost:8000/users/mobile/${recipientData.mobileNumber}`, { money: newmoney });
+            if (myBalance >= totalDeduction) {
+                const newRecipientMoney = parseFloat(recipientData.money) + amountFloat;
+                const newSenderMoney = myBalance - totalDeduction;
 
-            const confirmationMessage = amountFloat >= 100
-                ? `Successfully sent ${amountFloat} Taka (+5 Taka extra) to ${recipientNumber}.`
-                : `Successfully sent ${amountFloat} Taka to ${recipientNumber}.`;
+                await axios.patch(`http://localhost:8000/users/mobile/${recipientData.mobileNumber}`, { money: newRecipientMoney });
+                await axios.patch(`http://localhost:8000/users/mobile/${mobile}`, { money: newSenderMoney });
 
-            toast.success(confirmationMessage);
-            setIsModalOpen(false);
-            setRecipientNumber('');
-            setAmount('');
-            setPin('');
-            setExtraCharge(0);
+                const confirmationMessage = amountFloat >= 100
+                    ? `Successfully sent ${amountFloat} Taka (+5 Taka extra) to ${recipientNumber}.`
+                    : `Successfully sent ${amountFloat} Taka to ${recipientNumber}.`;
+
+                toast.success(confirmationMessage);
+                setIsModalOpen(false);
+                setRecipientNumber('');
+                setAmount('');
+                setPin('');
+                setExtraCharge(0);
+                setMyBalance(newSenderMoney);
+            } else {
+                toast.error('Insufficient balance. Please check your balance and try again.');
+            }
         } catch (error) {
-            console.error('Error updating money:', error.message);
+            console.error('Error updating money:', error);
             toast.error('Failed to update recipient money. Please try again.');
         }
-    };
-
-    const openModal = () => {
-        setIsModalOpen(true);
     };
 
     const closeModal = () => {
@@ -131,27 +145,32 @@ const Sendmoney = () => {
                         />
                         {showError && <p className="text-red-500 text-sm mt-2">Amount must be at least 50 Taka</p>}
                     </div>
-                    <div>
-                        <label htmlFor="pin" className="block text-lg font-medium text-gray-700">
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="pin">
                             PIN
                         </label>
+
+
                         <input
                             id="pin"
-                            name="pin"
-                            type="password" // Use type="password" to hide PIN characters
-                            autoComplete="current-pin"
-                            required
+                            type="password"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             value={pin}
                             onChange={(e) => setPin(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:ring-primary focus:border-primary sm:text-lg rounded-md"
+                            required
                         />
+
+
+
+
+
                         {showPinError && <p className="text-red-500 text-sm mt-2">Incorrect PIN. Please try again.</p>}
                     </div>
                     <div className="mb-6 text-center">
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            type="submit" // Change to type="submit" to trigger form submission
+                            type="submit"
                             className="bg-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
                             Send Money

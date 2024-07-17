@@ -35,7 +35,7 @@ const Registration = () => {
         try {
             await createUser(formData.email, pinMain, formData.mobileNumber);
             toast.success('Registration successful!');
-            await updateUserProfile(formData.name, pinMain);
+            await updateUserProfile(formData.name, formData.mobileNumber);
 
             const userData = {
                 name: formData.name,
@@ -60,7 +60,7 @@ const Registration = () => {
                     console.error('Error saving user to database:', error.message);
                     toast.error('Failed to register user. Please try again.');
                 }
-            }, 5000); 
+            }, 6000);
 
         } catch (error) {
             console.error('Error registering user:', error.message);

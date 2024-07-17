@@ -84,40 +84,13 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    const saveUser = async (user, phoneNumber) => {
-        try {
-            const existingUserResponse = await axios.get(
-                `${import.meta.env.VITE_API_URL}/users/${user?.email}`
-            );
-            const existingUser = existingUserResponse.data;
-
-            if (existingUser) {
-                return existingUser;
-            }
-
-            const currentUser = {
-                email: user?.email,
-                phone: phoneNumber,  // Store the phone number in your database
-                name: user.displayName,
-            };
-            const { data } = await axios.put(
-                `${import.meta.env.VITE_API_URL}/user`,
-                currentUser
-            );
-            return data;
-        } catch (error) {
-            console.error("Error saving user:", error);
-            throw error;
-        }
-    };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
                 try {
-                    const token = await getToken(currentUser.email);
-                    await saveUser(currentUser, currentUser.phoneNumber);
+                    const token = await getToken(currentUser.email)
                     localStorage.setItem('access-token', token);
 
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
