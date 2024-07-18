@@ -6,7 +6,7 @@ import { BsCashCoin } from "react-icons/bs";
 import { AuthContext } from '../../providers/AuthProvider';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import CountUp from 'react-countup'; // Import react-countup
+import CountUp from 'react-countup';
 
 const Money = () => {
     const [myMoney, setMyBalance] = useState(0);

@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import Money from '../../Components/Money/Money';
-import TransactionList from '../../Components/Trangection/Trangection';
+
 import Info from '../../Components/InfoBox/Info';
 import { AuthContext } from '../../providers/AuthProvider';
+import Trangection from '../../Components/Trangection/Trangection';
 
 const Home = () => {
     const { user } = useContext(AuthContext)
@@ -11,7 +12,7 @@ const Home = () => {
         <div>
             <Money />
             <Info />
-            <TransactionList></TransactionList>
+            <Trangection />
         </div>
     );
 };

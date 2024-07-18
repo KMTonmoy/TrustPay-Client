@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -32,7 +32,19 @@ const Cashout = () => {
         }
     }, [mobile]);
 
-    const handleCashout = async (e) => {
+    const generateTransactionId = () => {
+        return 'TX' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    };
+
+    const saveTransaction = async (transactionData) => {
+        try {
+            await axios.post('http://localhost:8000/transaction', transactionData);
+        } catch (error) {
+            console.error('Error saving transaction:', error);
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const amountFloat = parseFloat(amount);
@@ -53,16 +65,37 @@ const Cashout = () => {
                 return;
             }
 
-            const fee = amountFloat * 0.015; // 1.5% fee
+            const pinResponse = await axios.get(`http://localhost:8000/users/${user?.email}`);
+            const userData = pinResponse.data;
+
+            const mainPin = pin + 1;
+
+
+            if (userData.pin !== mainPin) {
+                toast.error('Incorrect PIN. Please try again.');
+                return;
+            }
+
+            const fee = amountFloat * 0.015;
             const totalAmount = amountFloat + fee;
 
             if (myBalance >= totalAmount) {
                 const newAgentMoney = parseFloat(agentData.money) + amountFloat;
                 const newSenderMoney = myBalance - totalAmount;
 
-                // Update balances
                 await axios.patch(`http://localhost:8000/users/mobile/${agentNumber}`, { money: newAgentMoney });
                 await axios.patch(`http://localhost:8000/users/mobile/${mobile}`, { money: newSenderMoney });
+
+                const transactionData = {
+                    transactionId: generateTransactionId(),
+                    senderMobile: mobile,
+                    recipientMobile: agentNumber,
+                    amount: amountFloat,
+                    fee: fee,
+                    transactionType: 'cashout',
+                    date: new Date().toISOString(),
+                };
+                await saveTransaction(transactionData);
 
                 toast.success(`Successfully cashed out ${amountFloat} Taka to Agent ${agentNumber}.`);
                 setIsModalOpen(false);
@@ -88,7 +121,7 @@ const Cashout = () => {
             <ToastContainer />
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-4 text-center">Cash Out</h2>
-                <form onSubmit={handleCashout}>
+                <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentNumber">
                             Agent Number
@@ -122,7 +155,7 @@ const Cashout = () => {
                         </label>
                         <input
                             id="pin"
-                            type="password" // Changed type to password for sensitive input
+                            type="password"
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             value={pin}
                             onChange={(e) => setPin(e.target.value)}
@@ -165,7 +198,7 @@ const Cashout = () => {
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={handleCashout}
+                                    onClick={handleSubmit}
                                     className="bg-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                                 >
                                     Confirm
